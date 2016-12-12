@@ -17,6 +17,11 @@ Example:
 -->
 <dom-module id="fs-person-sources">
   <template>
+    <style>
+      :host, paper-card {
+        display: block;
+      }
+    </style>
     <fs-client name="{{clientName}}" on-authenticated-changed="_authenticatedChanged"></fs-client>
     <paper-card>
       <template is="dom-repeat" items="{{sources}}">
