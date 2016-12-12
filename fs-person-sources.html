@@ -1,0 +1,85 @@
+<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../fs-client/fs-client.html">
+<link rel="import" href="../fs-behavior/fs-behavior.html">
+<link rel="import" href="../paper-card/paper-card.html">
+<link rel="import" href="../paper-item/paper-item.html">
+
+<!--
+List sources attached to a person in the Family Tree
+
+Example:
+
+    <fs-person-sources person-id="PPP-PPPP"></fs-person-sources>
+    
+@group FamilySearch Elements
+@element fs-person-sources
+@demo demo/index.html
+-->
+<dom-module id="fs-person-sources">
+  <template>
+    <fs-client name="{{clientName}}" on-authenticated-changed="_authenticatedChanged"></fs-client>
+    <paper-card>
+      <template is="dom-repeat" items="{{sources}}">
+        <paper-item><a href="{{item.about}}" target="_blank">{{_sourceTitle(item)}}</a></paper-item>
+      </template>
+    </paper-card>
+  </template>
+</dom-module>
+
+<script>
+  Polymer({
+    
+    is: 'fs-person-sources',
+    
+    properties: {
+      
+      personId: {
+        type: String,
+        observer: '_personIdChanged'
+      },
+      
+      requested: {
+        type: Boolean,
+        readOnly: true,
+        value: false
+      },
+      
+      sources: {
+        type: Array,
+        value: function(){
+          return [];
+        }
+      }
+      
+    },
+    
+    behaviors: [FSBehavior],
+    
+    _personIdChanged: function(){
+      this._setRequested(false);
+      this.sources = [];
+      if(this.personId){
+        this._loadSources();
+      }
+    },
+    
+    _loadSources: function(){
+      var self = this;
+      if(this.isAuthenticated() && this.personId && !this.requested){
+        this._setRequested(true);
+        this.getClient().get('/platform/tree/persons/' + this.personId + '/sources', function(error, response){
+          if(response && response.statusCode === 200){
+            self.sources = response.data.sourceDescriptions;
+          } else {
+            console.log('no data');
+          }
+        });
+      }
+    },
+    
+    _sourceTitle: function(source){
+      return source.titles[0].value;
+    }
+    
+  });
+</script>
