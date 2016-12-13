@@ -68,6 +68,12 @@ Example:
       }
     },
     
+    _authenticatedChanged: function(event){
+      if(event.detail.value){
+        this._loadSources();
+      }
+    },
+    
     _loadSources: function(){
       var self = this;
       if(this.isAuthenticated() && this.personId && !this.requested){
