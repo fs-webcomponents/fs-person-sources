@@ -27,6 +27,7 @@ Example:
       <template is="dom-repeat" items="{{sources}}">
         <paper-item><a href="{{item.about}}" target="_blank">{{_sourceTitle(item)}}</a></paper-item>
       </template>
+      <paper-item hidden$="{{!_isEmpty(sources)}}">No sources</paper-item>
     </paper-card>
   </template>
 </dom-module>
@@ -69,6 +70,7 @@ Example:
     },
     
     _authenticatedChanged: function(event){
+      this.sources = [];
       if(event.detail.value){
         this._loadSources();
       }
@@ -90,6 +92,10 @@ Example:
     
     _sourceTitle: function(source){
       return source.titles[0].value;
+    },
+    
+    _isEmpty: function(){
+      return this.sources.length === 0;
     }
     
   });
