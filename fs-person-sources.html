@@ -80,11 +80,10 @@ Example:
       var self = this;
       if(this.isAuthenticated() && this.personId && !this.requested){
         this._setRequested(true);
+        this.sources = [];
         this.getClient().get('/platform/tree/persons/' + this.personId + '/sources', function(error, response){
           if(response && response.statusCode === 200){
             self.sources = response.data.sourceDescriptions;
-          } else {
-            console.log('no data');
           }
         });
       }
