@@ -44,6 +44,13 @@ Example:
         observer: '_personIdChanged'
       },
       
+      loading: {
+        type: Boolean,
+        readOnly: true,
+        value: false,
+        notify: true
+      },
+      
       requested: {
         type: Boolean,
         readOnly: true,
@@ -80,8 +87,10 @@ Example:
       var self = this;
       if(this.isAuthenticated() && this.personId && !this.requested){
         this._setRequested(true);
+        this._setLoading(true);
         this.sources = [];
         this.getClient().get('/platform/tree/persons/' + this.personId + '/sources', function(error, response){
+          self._setLoading(false);
           if(response && response.statusCode === 200){
             self.sources = response.data.sourceDescriptions;
           }
