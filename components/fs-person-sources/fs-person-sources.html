@@ -1,0 +1,110 @@
+<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../fs-client/fs-client.html">
+<link rel="import" href="../fs-behavior/fs-behavior.html">
+<link rel="import" href="../paper-card/paper-card.html">
+<link rel="import" href="../paper-item/paper-item.html">
+
+<!--
+List sources attached to a person in the Family Tree
+
+Example:
+
+    <fs-person-sources person-id="PPP-PPPP"></fs-person-sources>
+    
+@group FamilySearch Elements
+@element fs-person-sources
+@demo demo/index.html
+-->
+<dom-module id="fs-person-sources">
+  <template>
+    <style>
+      :host, paper-card {
+        display: block;
+      }
+    </style>
+    <fs-client name="{{clientName}}" on-authenticated-changed="_authenticatedChanged"></fs-client>
+    <paper-card>
+      <template is="dom-repeat" items="{{sources}}">
+        <paper-item><a href="{{item.about}}" target="_blank">{{_sourceTitle(item)}}</a></paper-item>
+      </template>
+      <paper-item hidden$="{{!_isEmpty(sources)}}">No sources</paper-item>
+    </paper-card>
+  </template>
+</dom-module>
+
+<script>
+  Polymer({
+    
+    is: 'fs-person-sources',
+    
+    properties: {
+      
+      personId: {
+        type: String,
+        observer: '_personIdChanged'
+      },
+      
+      loading: {
+        type: Boolean,
+        readOnly: true,
+        value: false,
+        notify: true
+      },
+      
+      requested: {
+        type: Boolean,
+        readOnly: true,
+        value: false
+      },
+      
+      sources: {
+        type: Array,
+        value: function(){
+          return [];
+        }
+      }
+      
+    },
+    
+    behaviors: [FSBehavior],
+    
+    _personIdChanged: function(){
+      this._setRequested(false);
+      this.sources = [];
+      if(this.personId){
+        this._loadSources();
+      }
+    },
+    
+    _authenticatedChanged: function(event){
+      this.sources = [];
+      if(event.detail.value){
+        this._loadSources();
+      }
+    },
+    
+    _loadSources: function(){
+      var self = this;
+      if(this.isAuthenticated() && this.personId && !this.requested){
+        this._setRequested(true);
+        this._setLoading(true);
+        this.sources = [];
+        this.getClient().get('/platform/tree/persons/' + this.personId + '/sources', function(error, response){
+          self._setLoading(false);
+          if(response && response.statusCode === 200){
+            self.sources = response.data.sourceDescriptions;
+          }
+        });
+      }
+    },
+    
+    _sourceTitle: function(source){
+      return source.titles[0].value;
+    },
+    
+    _isEmpty: function(){
+      return this.sources.length === 0;
+    }
+    
+  });
+</script>
