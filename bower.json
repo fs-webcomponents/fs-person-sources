@@ -3,6 +3,7 @@
   "authors": [
     "Justin York"
   ],
+  "version": "3.0.0",
   "description": "List sources attached to a person in the Family Tree",
   "keywords": [
     "web-component",
