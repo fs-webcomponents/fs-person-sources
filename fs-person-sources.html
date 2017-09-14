@@ -46,7 +46,8 @@ Example:
         return {
           personId: {
             type: String,
-            observer: '_personIdChanged'
+            observer: '_personIdChanged',
+            reflectToAttribute: true
           },
           loading: {
             type: Boolean,
