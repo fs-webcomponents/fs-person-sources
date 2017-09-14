@@ -1,6 +1,6 @@
-<link rel="import" href="../polymer/polymer.html">
-<link rel="import" href="../fs-client/fs-client.html">
-<link rel="import" href="../fs-behavior/fs-behavior.html">
+<link rel="import" href="../polymer/polymer-element.html">
+<link rel="import" href="../fs-request/fs-request.html">
+<link rel="import" href="../fs-api-aware/fs-api-aware.html">
 <link rel="import" href="../paper-card/paper-card.html">
 <link rel="import" href="../paper-item/paper-item.html">
 
@@ -12,7 +12,8 @@ Example:
     <fs-person-sources person-id="PPP-PPPP"></fs-person-sources>
     
 @group FamilySearch Elements
-@element fs-person-sources
+@customElement
+@polymer
 @demo demo/index.html
 -->
 <dom-module id="fs-person-sources">
@@ -22,7 +23,13 @@ Example:
         display: block;
       }
     </style>
-    <fs-client name="{{clientName}}" on-authenticated-changed="_authenticatedChanged"></fs-client>
+    <fs-request
+      auto
+      url="{{_computeUrl(personId)}}"
+      client-name="[[clientName]]"
+      on-response="_handleResponse"
+      on-loading-changed="_updateLoading"
+      require-authentication></fs-request>
     <paper-card>
       <template is="dom-repeat" items="{{sources}}">
         <paper-item><a href="{{item.about}}" target="_blank">{{_sourceTitle(item)}}</a></paper-item>
@@ -33,78 +40,60 @@ Example:
 </dom-module>
 
 <script>
-  Polymer({
+  class FSPersonSources extends FSApiAwareMixin(Polymer.Element) {
     
-    is: 'fs-person-sources',
+    static get is() { return 'fs-person-sources'; }
     
-    properties: {
-      
-      personId: {
-        type: String,
-        observer: '_personIdChanged'
-      },
-      
-      loading: {
-        type: Boolean,
-        readOnly: true,
-        value: false,
-        notify: true
-      },
-      
-      requested: {
-        type: Boolean,
-        readOnly: true,
-        value: false
-      },
-      
-      sources: {
-        type: Array,
-        value: function(){
-          return [];
-        }
-      }
-      
-    },
-    
-    behaviors: [FSBehavior],
-    
-    _personIdChanged: function(){
-      this._setRequested(false);
-      this.sources = [];
-      if(this.personId){
-        this._loadSources();
-      }
-    },
-    
-    _authenticatedChanged: function(event){
-      this.sources = [];
-      if(event.detail.value){
-        this._loadSources();
-      }
-    },
-    
-    _loadSources: function(){
-      var self = this;
-      if(this.isAuthenticated() && this.personId && !this.requested){
-        this._setRequested(true);
-        this._setLoading(true);
-        this.sources = [];
-        this.getClient().get('/platform/tree/persons/' + this.personId + '/sources', function(error, response){
-          self._setLoading(false);
-          if(response && response.statusCode === 200){
-            self.sources = response.data.sourceDescriptions;
+    static get properties() {
+      return {
+        personId: {
+          type: String,
+          observer: '_personIdChanged'
+        },
+        loading: {
+          type: Boolean,
+          readOnly: true,
+          value: false,
+          notify: true
+        },
+        sources: {
+          type: Array,
+          value(){
+            return [];
           }
-        });
-      }
-    },
-    
-    _sourceTitle: function(source){
-      return source.titles[0].value;
-    },
-    
-    _isEmpty: function(){
-      return this.sources.length === 0;
+        }
+      };
     }
     
-  });
+    _personIdChanged() {
+      this.sources = [];
+    }
+    
+    _updateLoading(e) {
+      this._setLoading(e.detail.value);
+    }
+    
+    _computeUrl() {
+      if(this.personId){
+        return `/platform/tree/persons/${this.personId}/sources`;
+      }
+    }
+    
+    _handleResponse(e) {
+      if(e && e.detail && e.detail.response && e.detail.response.data) {
+        this.sources = e.detail.response.data.sourceDescriptions;
+      }
+    }
+    
+    _sourceTitle(source) {
+      return source.titles[0].value;
+    }
+    
+    _isEmpty() {
+      return this.sources && this.sources.length === 0;
+    }
+    
+  }
+  
+  customElements.define(FSPersonSources.is, FSPersonSources);
 </script>

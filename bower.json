@@ -19,13 +19,12 @@
   ],
   "dependencies": {
     "polymer": "Polymer/polymer#^2.0.0",
-    "fs-behavior": "fs-webcomponents/fs-behavior#^3.0.0",
-    "fs-client": "fs-webcomponents/fs-client#^3.0.0",
+    "fs-api-aware": "fs-webcomponents/fs-api-aware",
+    "fs-request": "fs-webcomponents/fs-request#v4",
     "paper-item": "PolymerElements/paper-item#^2.0.0",
     "paper-card": "PolymerElements/paper-card#^2.0.0"
   },
   "devDependencies": {
-    "iron-component-page": "PolymerElements/iron-component-page#^3.0.0",
-    "fs-signin": "fs-webcomponents/fs-signin#^3.0.0"
+    "fs-signin": "fs-webcomponents/fs-signin#v4"
   }
 }
