@@ -37,63 +37,62 @@ Example:
       <paper-item hidden$="{{!_isEmpty(sources)}}">No sources</paper-item>
     </paper-card>
   </template>
-</dom-module>
-
-<script>
-  class FSPersonSources extends FSApiAwareMixin(Polymer.Element) {
-    
-    static get is() { return 'fs-person-sources'; }
-    
-    static get properties() {
-      return {
-        personId: {
-          type: String,
-          observer: '_personIdChanged'
-        },
-        loading: {
-          type: Boolean,
-          readOnly: true,
-          value: false,
-          notify: true
-        },
-        sources: {
-          type: Array,
-          value(){
-            return [];
+  <script>
+    class FSPersonSources extends FSApiAwareMixin(Polymer.Element) {
+      
+      static get is() { return 'fs-person-sources'; }
+      
+      static get properties() {
+        return {
+          personId: {
+            type: String,
+            observer: '_personIdChanged'
+          },
+          loading: {
+            type: Boolean,
+            readOnly: true,
+            value: false,
+            notify: true
+          },
+          sources: {
+            type: Array,
+            value(){
+              return [];
+            }
           }
+        };
+      }
+      
+      _personIdChanged() {
+        this.sources = [];
+      }
+      
+      _updateLoading(e) {
+        this._setLoading(e.detail.value);
+      }
+      
+      _computeUrl() {
+        if(this.personId){
+          return `/platform/tree/persons/${this.personId}/sources`;
         }
-      };
-    }
-    
-    _personIdChanged() {
-      this.sources = [];
-    }
-    
-    _updateLoading(e) {
-      this._setLoading(e.detail.value);
-    }
-    
-    _computeUrl() {
-      if(this.personId){
-        return `/platform/tree/persons/${this.personId}/sources`;
       }
-    }
-    
-    _handleResponse(e) {
-      if(e && e.detail && e.detail.response && e.detail.response.data) {
-        this.sources = e.detail.response.data.sourceDescriptions;
+      
+      _handleResponse(e) {
+        if(e && e.detail && e.detail.response && e.detail.response.data) {
+          this.sources = e.detail.response.data.sourceDescriptions;
+        }
       }
+      
+      _sourceTitle(source) {
+        return source.titles[0].value;
+      }
+      
+      _isEmpty() {
+        return this.sources && this.sources.length === 0;
+      }
+      
     }
     
-    _sourceTitle(source) {
-      return source.titles[0].value;
-    }
-    
-    _isEmpty() {
-      return this.sources && this.sources.length === 0;
-    }
-    
-  }
-  
-  customElements.define(FSPersonSources.is, FSPersonSources);
-</script>
+    customElements.define(FSPersonSources.is, FSPersonSources);
+  </script>
+</dom-module>
