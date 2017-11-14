@@ -79,7 +79,7 @@ Example:
       }
       
       _handleResponse(e) {
-        if(e && e.detail && e.detail.response && e.detail.response.data) {
+        if(e && e.detail && e.detail.response && e.detail.response.data && e.detail.response.data.sourceDescriptions) {
           this.sources = e.detail.response.data.sourceDescriptions;
         }
       }
