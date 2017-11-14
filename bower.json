@@ -1,9 +1,6 @@
 {
   "name": "fs-person-sources",
-  "authors": [
-    "Justin York"
-  ],
-  "version": "4.0.0",
+  "version": "4.0.1",
   "description": "List sources attached to a person in the Family Tree",
   "keywords": [
     "web-component",
